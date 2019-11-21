@@ -65,8 +65,8 @@ function PlayStageState:_load_units()
 end
 
 function PlayStageState:_create_unit_at(specname, pos)
-  local unit = rules:new_unit(specname)
-  self.atlas:add(unit, pos, unit:get_appearance())
+  local unit = rules:new_unit(specname, pos)
+  self.atlas:add(unit, unit:get_position(), unit:get_appearance())
   return unit
 end
 

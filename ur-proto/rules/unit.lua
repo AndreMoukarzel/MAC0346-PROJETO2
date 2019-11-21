@@ -57,6 +57,15 @@ return function (ruleset)
     end
   end
 
+  function ruleset.define:get_position(e)
+    function self.when()
+      return r:is(e, 'unit')
+    end
+    function self.apply()
+      return r:get(e, 'unit', 'position')
+    end
+  end
+
   --[[
   function ruleset.define:is_dead(e)
     function self.when()
