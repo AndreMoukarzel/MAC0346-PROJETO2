@@ -3,7 +3,7 @@ return function (ruleset)
   local Vec = require 'common.vec'
   local r = ruleset.record
 
-  r:new_property('unit', { spec = nil, hp, power = 1, range = 1, speed = 0, position = Vec() })
+  r:new_property('unit', { specname = "", hp, power = 1, range = 1, speed = 0, position = Vec() })
 
   function ruleset.define:new_unit(specname, initial_position)
     function self.when()
@@ -12,10 +12,21 @@ return function (ruleset)
     function self.apply()
       local e = ruleset:new_entity()
       local spec = require('database.units.' .. specname)
-      r:set(e, 'named', { name = name })
-      r:set(e, 'unit', { spec = spec, hp = spec.max_hp, power = spec.power, range = spec.range or 0,
-                         speed = spec.speed or 0, position = initial_position})
+      r:set(e, 'named', { name = spec.name })
+      r:set(e, 'unit', { specname = specname, hp = spec.max_hp, power = spec.power or 1,
+                         range = spec.range or 1, speed = spec.speed or 0,
+                         position = initial_position})
       return e
+    end
+  end
+
+  function ruleset.define:get_appearance(e)
+    function self.when()
+      return r:is(e, 'unit')
+    end
+    function self.apply()
+      local spec = require('database.units.' .. r:get(e, 'unit', 'specname'))
+      return spec.appearance
     end
   end
 

@@ -9,6 +9,14 @@ local Stats = require 'view.stats'
 local State = require 'state'
 
 local PlayStageState = require 'common.class' (State)
+package.path = "lib/?.lua;lib/?/init.lua;" .. package.path
+
+local RULE_MODULES = { 'rules' }
+
+local RULESETS = { 'unit' }
+
+local rules = require 'ur-proto' (RULE_MODULES, RULESETS)
+
 
 function PlayStageState:_init(stack)
   self:super(stack)
@@ -57,7 +65,7 @@ function PlayStageState:_load_units()
 end
 
 function PlayStageState:_create_unit_at(specname, pos)
-  local unit = Unit(specname)
+  local unit = rules:new_unit(specname)
   self.atlas:add(unit, pos, unit:get_appearance())
   return unit
 end
