@@ -84,7 +84,9 @@ function PlayStageState:update(dt)
   while pending > 0 do
     local x, y = rand(5, 7), -rand(5, 7)
     local pos = self.battlefield:tile_to_screen(x, y)
-    local monster = self:_create_unit_at('green_slime', pos)
+    if(not self.wave:is_finish()) then
+      local monster = self:_create_unit_at(self.wave:next_monster(), pos)
+    end
     self.monsters[monster] = true
     pending = pending - 1
   end
