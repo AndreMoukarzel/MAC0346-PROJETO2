@@ -75,17 +75,6 @@ return function (ruleset)
     end
   end
 
-  --[[
-  function ruleset.define:is_dead(e)
-    function self.when()
-      return r:is(e, 'unit')
-    end
-    function self.apply()
-      return e.toughness <= 0
-    end
-  end
-  ]]
-
   function ruleset.define:get_description(e)
     function self.when()
       return r:is(e, 'unit')
@@ -120,6 +109,15 @@ return function (ruleset)
     function self.apply()
       current_hp = r:get(e, 'unit', 'hp')
       r:set(e, 'unit', { hp = math.max(0, current_hp - damage) })
+    end
+  end
+
+  function ruleset.define:is_dead(e)
+    function self.when()
+      return r:is(e, 'unit')
+    end
+    function self.apply()
+      return r:get(e, 'unit', 'hp') == 0
     end
   end
 
