@@ -92,6 +92,10 @@ function PlayStageState:update(dt)
   end
   for monster in pairs(self.monsters) do
     monster:move(self.monsters, self.player_units, dt)
+    if monster:is_dead() then
+      self.monsters[monster] = nil
+      self.atlas:remove(monster)
+    end
   end
 end
 
