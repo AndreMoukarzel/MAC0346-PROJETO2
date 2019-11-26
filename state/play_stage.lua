@@ -24,7 +24,7 @@ function PlayStageState:_init(stack)
   self.cursor = nil
   self.atlas = nil
   self.battlefield = nil
-  self.units = nil
+  self.player_units = nil
   self.wave = nil
   self.stats = nil
   self.monsters = nil
@@ -57,8 +57,9 @@ end
 
 function PlayStageState:_load_units()
   local pos = self.battlefield:tile_to_screen(-6, 6)
-  self.units = {}
-  self:_create_unit_at('capital', pos)
+  local capital = self:_create_unit_at('capital', pos)
+  self.player_units = {}
+  self.player_units[capital] = true
   self.wave = Wave(self.stage.waves[1])
   self.wave:start()
   self.monsters = {}
@@ -88,7 +89,7 @@ function PlayStageState:update(dt)
     pending = pending - 1
   end
   for monster in pairs(self.monsters) do
-    monster:move(self.monsters, dt)
+    monster:move(self.monsters, self.player_units, dt)
   end
 end
 

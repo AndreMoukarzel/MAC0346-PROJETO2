@@ -20,6 +20,15 @@ return function (ruleset)
     end
   end
 
+  function ruleset.define:get_name(e)
+    function self.when()
+      return r:is(e, 'named')
+    end
+    function self.apply()
+      return r:get(e, 'named', 'name')
+    end
+  end
+
   function ruleset.define:get_appearance(e)
     function self.when()
       return r:is(e, 'unit')
@@ -86,13 +95,22 @@ return function (ruleset)
     end
   end
 
-  function ruleset.define:move(e, all_units, dt)
+  function ruleset.define:move(e, monsters, player_units, dt)
     function self.when()
       return r:is(e, 'unit') and r:get(e, 'unit', 'speed') > 0
     end
     function self.apply()
       local spd = r:get(e, 'unit', 'speed')
-      r:set(e, 'unit', { position = r:get(e, 'unit', 'position'):add(Vec(-spd, spd) * dt) })
+      local target = Vec(-7, -7)
+      for unit in pairs(player_units) do
+        if unit:get_name() == "Capital" then
+          target = unit:get_position()
+          break
+        end
+      end
+      print((target - e:get_position()))
+      local movement = (target - e:get_position()) * spd/100.0 * dt
+      r:set(e, 'unit', { position = r:get(e, 'unit', 'position'):add(movement) })
     end
   end
 
