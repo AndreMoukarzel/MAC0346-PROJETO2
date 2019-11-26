@@ -108,8 +108,7 @@ return function (ruleset)
           break
         end
       end
-      print((target - e:get_position()))
-      local movement = (target - e:get_position()) * spd/100.0 * dt
+      local movement = (target - e:get_position()):normalized() * spd * dt
       r:set(e, 'unit', { position = r:get(e, 'unit', 'position'):add(movement) })
     end
   end
