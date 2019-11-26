@@ -100,6 +100,18 @@ function PlayStageState:update(dt)
       self.atlas:remove(monster)
     end
   end
+
+  for unit in pairs(self.player_units) do
+    local attacking_monsters = unit:in_range_of(self.monsters)
+    for monster in pairs(attacking_monsters) do
+      unit:damage(monster:get_power() * dt)
+    end
+    if unit:is_dead() then
+      self.player_units[unit] = nil
+      self.atlas:remove(unit)
+    end
+  end
+
 end
 
 return PlayStageState
