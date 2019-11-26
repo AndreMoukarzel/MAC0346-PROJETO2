@@ -101,6 +101,7 @@ function PlayStageState:update(dt)
     end
   end
 
+  local has_capital = false
   for unit in pairs(self.player_units) do
     local attacking_monsters = unit:in_range_of(self.monsters)
     for monster in pairs(attacking_monsters) do
@@ -110,8 +111,13 @@ function PlayStageState:update(dt)
       self.player_units[unit] = nil
       self.atlas:remove(unit)
     end
+    if unit:get_name() == "Capital" then
+      has_capital = true
+    end
   end
-
+  if not has_capital then
+    self:pop()
+  end
 end
 
 return PlayStageState
