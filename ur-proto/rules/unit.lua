@@ -84,6 +84,19 @@ return function (ruleset)
     end
   end
 
+  function ruleset.define:collide(e, other)
+    function self.when()
+      return r:is(e, 'unit') and r:get(e, 'unit', 'speed') > 0
+    end
+    function self.apply()
+      local delta = other:get_position() - e:get_position()
+      if delta:length() < 32 then
+        r:set(e, 'unit', { position = r:get(e, 'unit', 'position'):add(-delta:normalized() * 
+                                                                       delta:length()) })
+      end
+    end
+  end
+
   function ruleset.define:move(e, monsters, player_units, dt)
     function self.when()
       return r:is(e, 'unit') and r:get(e, 'unit', 'speed') > 0
@@ -99,6 +112,12 @@ return function (ruleset)
       end
       local movement = (target - e:get_position()):normalized() * spd * dt
       r:set(e, 'unit', { position = r:get(e, 'unit', 'position'):add(movement) })
+      for unit in pairs(monsters) do
+        e:collide(unit)
+      end
+      for unit in pairs(player_units) do
+        e:collide(unit)
+      end
     end
   end
 
@@ -109,6 +128,22 @@ return function (ruleset)
     function self.apply()
       current_hp = r:get(e, 'unit', 'hp')
       r:set(e, 'unit', { hp = math.max(0, current_hp - damage) })
+    end
+  end
+
+  function ruleset.define:in_range_of(e, enemies)
+    function self.when()
+      return r:is(e, 'unit')
+    end
+    function self.apply()
+      local in_range_units = {}
+      for unit in pairs(enemies) do
+        local range = unit:get_range() * 32
+        if (unit:get_position() - e:get_position()):length() <= range then
+          in_range_units[unit] = true
+        end
+      end
+      return in_range_units
     end
   end
 

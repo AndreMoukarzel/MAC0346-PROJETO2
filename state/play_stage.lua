@@ -77,7 +77,8 @@ end
 
 function PlayStageState:on_mousepressed(_, _, button)
   if button == 1 then
-    self:_create_unit_at('warrior', Vec(self.cursor:get_position()))
+    local warrior = self:_create_unit_at('warrior', Vec(self.cursor:get_position()))
+    self.player_units[warrior] = true
   end
 end
 
@@ -104,10 +105,32 @@ function PlayStageState:update(dt)
   end
   for monster in pairs(self.monsters) do
     monster:move(self.monsters, self.player_units, dt)
+    local attacking_units = monster:in_range_of(self.player_units)
+    for unit in pairs(attacking_units) do
+      monster:damage(unit:get_power() * dt)
+    end
     if monster:is_dead() then
       self.monsters[monster] = nil
       self.atlas:remove(monster)
     end
+  end
+
+  local has_capital = false
+  for unit in pairs(self.player_units) do
+    local attacking_monsters = unit:in_range_of(self.monsters)
+    for monster in pairs(attacking_monsters) do
+      unit:damage(monster:get_power() * dt)
+    end
+    if unit:is_dead() then
+      self.player_units[unit] = nil
+      self.atlas:remove(unit)
+    end
+    if unit:get_name() == "Capital" then
+      has_capital = true
+    end
+  end
+  if not has_capital then
+    self:pop()
   end
 end
 
