@@ -112,6 +112,22 @@ return function (ruleset)
     end
   end
 
+  function ruleset.define:in_range_of(e, player_units)
+    function self.when()
+      return r:is(e, 'unit')
+    end
+    function self.apply()
+      local in_range_units = {}
+      for unit in pairs(player_units) do
+        local range = unit:get_range() * 32
+        if (unit:get_position() - e:get_position()):length() <= range then
+          in_range_units[unit] = true
+        end
+      end
+      return in_range_units
+    end
+  end
+
   function ruleset.define:is_dead(e)
     function self.when()
       return r:is(e, 'unit')
