@@ -6,6 +6,8 @@ function Wave:_init(spawns)
   self.delay = 3
   self.left = nil
   self.pending = 0
+  self.current_monster = 1
+
 end
 
 function Wave:start()
@@ -26,5 +28,16 @@ function Wave:poll()
   return pending
 end
 
+function Wave:is_finish()
+  return self.current_monster == #self.spawns and self.spawns[self.current_monster][2] == 0
+end
+
+function Wave:next_monster()
+  if (self.spawns[self.current_monster][2] == 0) then
+    self.current_monster = self.current_monster + 1
+  end
+  self.spawns[self.current_monster][2] = self.spawns[self.current_monster][2] - 1
+  return self.spawns[self.current_monster][1]
+end
 return Wave
 

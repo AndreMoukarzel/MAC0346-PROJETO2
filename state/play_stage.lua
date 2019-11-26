@@ -28,6 +28,8 @@ function PlayStageState:_init(stack)
   self.wave = nil
   self.stats = nil
   self.monsters = nil
+  self.max_wave = nil
+  self.next_wave = nil
 end
 
 function PlayStageState:enter(params)
@@ -61,6 +63,8 @@ function PlayStageState:_load_units()
   self.player_units = {}
   self.player_units[capital] = true
   self.wave = Wave(self.stage.waves[1])
+  self.max_wave = #self.stage.waves
+  self.next_wave = 2
   self.wave:start()
   self.monsters = {}
 end
@@ -81,13 +85,21 @@ function PlayStageState:update(dt)
   self.wave:update(dt)
   local pending = self.wave:poll()
   local rand = love.math.random
+  if (#self.monsters == 0 and self.wave:is_finish()) then
+    if (self.next_wave > self.max_wave) then
+      self.self:pop()
+    end
+    self.wave = Wave(self.stage.waves[self.next_wave])
+    self.wave:start()
+    self.next_wave = self.next_wave + 1
+  end
   while pending > 0 do
     local x, y = rand(5, 7), -rand(5, 7)
     local pos = self.battlefield:tile_to_screen(x, y)
     if(not self.wave:is_finish()) then
       local monster = self:_create_unit_at(self.wave:next_monster(), pos)
+      self.monsters[monster] = true
     end
-    self.monsters[monster] = true
     pending = pending - 1
   end
   for monster in pairs(self.monsters) do
