@@ -84,6 +84,19 @@ return function (ruleset)
     end
   end
 
+  function ruleset.define:collide(e, other)
+    function self.when()
+      return r:is(e, 'unit') and r:get(e, 'unit', 'speed') > 0
+    end
+    function self.apply()
+      local delta = other:get_position() - e:get_position()
+      if delta:length() < 32 then
+        r:set(e, 'unit', { position = r:get(e, 'unit', 'position'):add(-delta:normalized() * 
+                                                                       delta:length()) })
+      end
+    end
+  end
+
   function ruleset.define:move(e, monsters, player_units, dt)
     function self.when()
       return r:is(e, 'unit') and r:get(e, 'unit', 'speed') > 0
@@ -99,6 +112,12 @@ return function (ruleset)
       end
       local movement = (target - e:get_position()):normalized() * spd * dt
       r:set(e, 'unit', { position = r:get(e, 'unit', 'position'):add(movement) })
+      for unit in pairs(monsters) do
+        e:collide(unit)
+      end
+      for unit in pairs(player_units) do
+        e:collide(unit)
+      end
     end
   end
 
