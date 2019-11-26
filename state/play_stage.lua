@@ -88,8 +88,7 @@ function PlayStageState:update(dt)
     pending = pending - 1
   end
   for monster in pairs(self.monsters) do
-    local sprite_instance = self.atlas:get(monster)
-    sprite_instance.position:add(Vec(-1, 1) * 10 * dt)
+    monster:move(self.monsters, dt)
   end
 end
 

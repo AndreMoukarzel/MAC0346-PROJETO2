@@ -86,7 +86,7 @@ return function (ruleset)
     end
   end
 
-  function ruleset.define:calculate_movement(e, all_units, dt)
+  function ruleset.define:move(e, all_units, dt)
     function self.when()
       return r:is(e, 'unit') and r:get(e, 'unit', 'speed') > 0
     end
