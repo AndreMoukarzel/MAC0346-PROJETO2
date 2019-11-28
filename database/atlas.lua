@@ -37,7 +37,11 @@ return {
     priest = {
       frame = { 24, 0 },
       color = 'white'
-    }
+    },
+    trophy = {
+      frame = {24, 28},
+      color = 'yellow'
+  }
   }
 }
 

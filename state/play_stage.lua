@@ -17,6 +17,7 @@ local RULESETS = { 'unit' }
 
 local rules = require 'ur-proto' (RULE_MODULES, RULESETS)
 
+local wait_time = 3
 
 function PlayStageState:_init(stack)
   self:super(stack)
@@ -30,6 +31,7 @@ function PlayStageState:_init(stack)
   self.monsters = nil
   self.max_wave = nil
   self.next_wave = nil
+  self.n_monsters = nil
 end
 
 function PlayStageState:enter(params)
@@ -65,8 +67,10 @@ function PlayStageState:_load_units()
   self.wave = Wave(self.stage.waves[1])
   self.max_wave = #self.stage.waves
   self.next_wave = 2
-  self.wave:start()
+  self.wave:start(wait_time)
+  self.stats:set_time(wait_time)
   self.monsters = {}
+  self.n_monsters = 0
 end
 
 function PlayStageState:_create_unit_at(specname, pos)
@@ -84,22 +88,25 @@ end
 
 function PlayStageState:update(dt)
   self.wave:update(dt)
+  self.stats:update(dt)
   local pending = self.wave:poll()
   local rand = love.math.random
-  if (#self.monsters == 0 and self.wave:is_finish()) then
-    if (self.next_wave > self.max_wave) then
-      self.self:pop()
+  if self.n_monsters == 0 and self.wave:is_finish() then
+    if self.next_wave > self.max_wave then
+      self:pop()
     end
     self.wave = Wave(self.stage.waves[self.next_wave])
-    self.wave:start()
+    self.wave:start(wait_time)
+    self.stats:set_time(wait_time)
     self.next_wave = self.next_wave + 1
   end
   while pending > 0 do
-    local x, y = rand(5, 7), -rand(5, 7)
-    local pos = self.battlefield:tile_to_screen(x, y)
-    if(not self.wave:is_finish()) then
+    if not self.wave:is_finish() and not self.wave:initializing() then
+      local x, y = rand(5, 7), -rand(5, 7)
+      local pos = self.battlefield:tile_to_screen(x, y)
       local monster = self:_create_unit_at(self.wave:next_monster(), pos)
       self.monsters[monster] = true
+      self.n_monsters = self.n_monsters + 1
     end
     pending = pending - 1
   end
@@ -112,6 +119,7 @@ function PlayStageState:update(dt)
     if monster:is_dead() then
       self.monsters[monster] = nil
       self.atlas:remove(monster)
+      self.n_monsters = self.n_monsters - 1
     end
   end
 
