@@ -93,7 +93,7 @@ function PlayStageState:update(dt)
   local rand = love.math.random
   if self.n_monsters == 0 and self.wave:is_finish() then
     if self.next_wave > self.max_wave then
-      self:pop()
+      self:push("win", {self.battlefield, self.atlas})
     end
     self.wave = Wave(self.stage.waves[self.next_wave])
     self.wave:start(wait_time)
@@ -138,6 +138,12 @@ function PlayStageState:update(dt)
     end
   end
   if not has_capital then
+    self:pop()
+  end
+end
+
+function PlayStageState:resume(params)
+  if params == 'win' then
     self:pop()
   end
 end
