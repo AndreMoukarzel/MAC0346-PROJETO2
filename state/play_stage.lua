@@ -17,8 +17,6 @@ local RULESETS = { 'unit' }
 
 local rules = require 'ur-proto' (RULE_MODULES, RULESETS)
 
-local wait_time = 3
-
 function PlayStageState:_init(stack)
   self:super(stack)
   self.stage = nil
@@ -32,6 +30,8 @@ function PlayStageState:_init(stack)
   self.max_wave = nil
   self.next_wave = nil
   self.n_monsters = nil
+  self.wait_time = 0
+  self.time_left = 0
 end
 
 function PlayStageState:enter(params)
@@ -53,6 +53,9 @@ function PlayStageState:_load_view()
   self.cursor = Cursor(self.battlefield)
   local _, right, top, _ = self.battlefield.bounds:get()
   self.stats = Stats(Vec(right + 16, top))
+  self.wait_time = 3
+  self.time_left = self.wait_time
+  self.stats:set_time(self.time_left)
   self:view('bg'):add('battlefield', self.battlefield)
   self:view('fg'):add('atlas', self.atlas)
   self:view('bg'):add('cursor', self.cursor)
@@ -67,8 +70,7 @@ function PlayStageState:_load_units()
   self.wave = Wave(self.stage.waves[1])
   self.max_wave = #self.stage.waves
   self.next_wave = 2
-  self.wave:start(wait_time)
-  self.stats:set_time(wait_time)
+  self.wave:start()
   self.monsters = {}
   self.n_monsters = 0
 end
@@ -87,58 +89,65 @@ function PlayStageState:on_mousepressed(_, _, button)
 end
 
 function PlayStageState:update(dt)
-  self.wave:update(dt)
-  self.stats:update(dt)
-  local pending = self.wave:poll()
-  local rand = love.math.random
-  if self.n_monsters == 0 and self.wave:is_finish() then
-    if self.next_wave > self.max_wave then
-      self:push("win", {self.battlefield, self.atlas})
+  if self.time_left <= 0 then
+    if self.n_monsters == 0 and self.wave:is_finish() then
+      if self.next_wave > self.max_wave then
+        self:push("win", {self.battlefield, self.atlas})
+      else
+        self.wave = Wave(self.stage.waves[self.next_wave])
+        self.next_wave = self.next_wave + 1
+        self.wave:start()
+        self.time_left = self.wait_time
+        self.stats:set_time(self.time_left)
+        return
+      end
     end
-    self.wave = Wave(self.stage.waves[self.next_wave])
-    self.wave:start(wait_time)
-    self.stats:set_time(wait_time)
-    self.next_wave = self.next_wave + 1
-  end
-  while pending > 0 do
-    if not self.wave:is_finish() and not self.wave:initializing() then
-      local x, y = rand(5, 7), -rand(5, 7)
-      local pos = self.battlefield:tile_to_screen(x, y)
-      local monster = self:_create_unit_at(self.wave:next_monster(), pos)
-      self.monsters[monster] = true
-      self.n_monsters = self.n_monsters + 1
+    self.wave:update(dt)
+    local pending = self.wave:poll()
+    while pending > 0 do
+      if not self.wave:is_finish() then
+        local rand = love.math.random
+        local x, y = rand(5, 7), -rand(5, 7)
+        local pos = self.battlefield:tile_to_screen(x, y)
+        local monster = self:_create_unit_at(self.wave:next_monster(), pos)
+        self.monsters[monster] = true
+        self.n_monsters = self.n_monsters + 1
+      end
+      pending = pending - 1
     end
-    pending = pending - 1
-  end
-  for monster in pairs(self.monsters) do
-    monster:move(self.monsters, self.player_units, dt)
-    local attacking_units = monster:in_range_of(self.player_units)
-    for unit in pairs(attacking_units) do
-      monster:damage(unit:get_power() * dt)
+    for monster in pairs(self.monsters) do
+      monster:move(self.monsters, self.player_units, dt)
+      local attacking_units = monster:in_range_of(self.player_units)
+      for unit in pairs(attacking_units) do
+        monster:damage(unit:get_power() * dt)
+      end
+      if monster:is_dead() then
+        self.monsters[monster] = nil
+        self.atlas:remove(monster)
+        self.n_monsters = self.n_monsters - 1
+      end
     end
-    if monster:is_dead() then
-      self.monsters[monster] = nil
-      self.atlas:remove(monster)
-      self.n_monsters = self.n_monsters - 1
-    end
-  end
 
-  local has_capital = false
-  for unit in pairs(self.player_units) do
-    local attacking_monsters = unit:in_range_of(self.monsters)
-    for monster in pairs(attacking_monsters) do
-      unit:damage(monster:get_power() * dt)
+    local has_capital = false
+    for unit in pairs(self.player_units) do
+      local attacking_monsters = unit:in_range_of(self.monsters)
+      for monster in pairs(attacking_monsters) do
+        unit:damage(monster:get_power() * dt)
+      end
+      if unit:is_dead() then
+        self.player_units[unit] = nil
+        self.atlas:remove(unit)
+      end
+      if unit:get_name() == "Capital" then
+        has_capital = true
+      end
     end
-    if unit:is_dead() then
-      self.player_units[unit] = nil
-      self.atlas:remove(unit)
+    if not has_capital then
+      self:pop()
     end
-    if unit:get_name() == "Capital" then
-      has_capital = true
-    end
-  end
-  if not has_capital then
-    self:pop()
+  else
+    self.time_left = self.time_left - dt
+    self.stats:set_time(self.time_left)
   end
 end
 

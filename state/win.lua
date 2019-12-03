@@ -14,7 +14,7 @@ function WinState:enter(params)
 end
 
 function WinState:on_keypressed(key)
-  if key == 'escape' or key == 'enter' then
+  if key == 'escape' or key == 'return' then
     return self:pop("win")
   end
 end
