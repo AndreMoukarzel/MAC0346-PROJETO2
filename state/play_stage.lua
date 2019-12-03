@@ -1,6 +1,5 @@
 
 local Wave = require 'model.wave'
-local Unit = require 'model.unit'
 local Vec = require 'common.vec'
 local Cursor = require 'view.cursor'
 local SpriteAtlas = require 'view.sprite_atlas'
@@ -55,11 +54,13 @@ function PlayStageState:_load_view()
   local _, right, top, _ = self.battlefield.bounds:get()
   self.stats = Stats(Vec(right + 16, top))
   self.unit_selector = UnitSelector(self.stage.buyables, Vec(600, 400), self.atlas)
+  self.buyables_cursor = Cursor(self.unit_selector)
   self:view('bg'):add('battlefield', self.battlefield)
   self:view('fg'):add('atlas', self.atlas)
   self:view('bg'):add('cursor', self.cursor)
   self:view('hud'):add('stats', self.stats)
   self:view('us'):add('unit_selector', self.unit_selector)
+  self:view('bg'):add('buyables_cursor', self.buyables_cursor)
 end
 
 function PlayStageState:_load_units()

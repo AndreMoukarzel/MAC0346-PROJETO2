@@ -15,7 +15,7 @@ local rules = require 'ur-proto' (RULE_MODULES, RULESETS)
 function UnitSelector:_init(units, center, atlas)
   local size = Vec(1, #units) * 32
   for i, unit_name in pairs(units) do
-    local unit = rules:new_unit(unit_name, center + Vec(16, 32 * i) - size/2)
+    local unit = rules:new_unit(unit_name, center + Vec(16, 32 * (i - 1)) - size/2)
   	atlas:add(unit, unit:get_position(), unit:get_appearance())
   end
   self.units = units
@@ -31,7 +31,7 @@ function UnitSelector:round_to_tile(pos)
   local center = self:center()
   local dist = pos - center
   local tile = ((dist + Vec(16, 16)) / 32):floor()
-  tile:clamp(7, 7)
+  tile:clamp(0, #self.units - 1)
   return center + tile * 32
 end
 
