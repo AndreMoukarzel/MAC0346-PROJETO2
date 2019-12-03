@@ -3,8 +3,21 @@ local Box = require 'common.box'
 local Vec = require 'common.vec'
 local UnitSelector = require 'common.class' ()
 
-function UnitSelector:_init(units, center)
+package.path = "lib/?.lua;lib/?/init.lua;" .. package.path
+
+local RULE_MODULES = { 'rules' }
+
+local RULESETS = { 'unit' }
+
+local rules = require 'ur-proto' (RULE_MODULES, RULESETS)
+
+
+function UnitSelector:_init(units, center, atlas)
   local size = Vec(1, #units) * 32
+  for i, unit_name in pairs(units) do
+    local unit = rules:new_unit(unit_name, center + Vec(16, 32 * i) - size/2)
+  	atlas:add(unit, unit:get_position(), unit:get_appearance())
+  end
   self.units = units
   self.bounds = Box.from_vec(center, size)
 end
