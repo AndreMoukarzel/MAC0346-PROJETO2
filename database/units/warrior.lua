@@ -7,4 +7,3 @@ return {
   power = 5,
   range = 2
 }
-

@@ -5,6 +5,7 @@ local Vec = require 'common.vec'
 local Cursor = require 'view.cursor'
 local SpriteAtlas = require 'view.sprite_atlas'
 local BattleField = require 'view.battlefield'
+local UnitSelector = require 'view.unit_selector'
 local Stats = require 'view.stats'
 local State = require 'state'
 
@@ -53,10 +54,12 @@ function PlayStageState:_load_view()
   self.cursor = Cursor(self.battlefield)
   local _, right, top, _ = self.battlefield.bounds:get()
   self.stats = Stats(Vec(right + 16, top))
+  self.unit_selector = UnitSelector(self.stage.buyables, Vec(600, 400))
   self:view('bg'):add('battlefield', self.battlefield)
   self:view('fg'):add('atlas', self.atlas)
   self:view('bg'):add('cursor', self.cursor)
   self:view('hud'):add('stats', self.stats)
+  self:view('us'):add('unit_selector', self.unit_selector)
 end
 
 function PlayStageState:_load_units()
@@ -149,4 +152,3 @@ function PlayStageState:resume(params)
 end
 
 return PlayStageState
-
