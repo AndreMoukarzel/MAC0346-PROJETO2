@@ -7,33 +7,24 @@ function Wave:_init(spawns)
   self.left = nil
   self.pending = 0
   self.current_monster = 1
-  self.initial_wait_time = 0
 end
 
-function Wave:start(time)
-  self.initial_wait_time = time
+function Wave:start()
   self.left = self.delay
 end
 
 function Wave:update(dt)
-  if self.initial_wait_time > 0 then
-    self.initial_wait_time = math.max(self.initial_wait_time - dt, 0)
-  else
-    self.left = self.left - dt
-    if self.left <= 0 then
-      self.left = self.left + self.delay
-      self.pending = self.pending + 1
-    end
+  self.left = self.left - dt
+  if self.left <= 0 then
+    self.left = self.left + self.delay
+    self.pending = self.pending + 1
   end
 end
 
 function Wave:poll()
-  if self.initial_wait_time <= 0 then
-    local pending = self.pending
-    self.pending = 0
-    return pending
-  end
-  return 0
+  local pending = self.pending
+  self.pending = 0
+  return pending
 end
 
 function Wave:is_finish()

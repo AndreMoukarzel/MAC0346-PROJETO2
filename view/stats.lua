@@ -14,12 +14,6 @@ function Stats:set_time(time)
   self.time_left = time
 end
 
-function Stats:update(dt)
-  if self.time_left > 0 then
-    self.time_left = self.time_left - dt
-  end
-end
-
 function Stats:draw()
   local g = love.graphics
   g.push()
