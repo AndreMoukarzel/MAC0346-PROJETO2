@@ -3,7 +3,7 @@ return function (ruleset)
   local Vec = require 'common.vec'
   local r = ruleset.record
 
-  r:new_property('unit', { appearance = "", max_hp = 1, hp = 1, power = 1, range = 1, speed = 0,
+  r:new_property('unit', { appearance = "", max_hp = 1, hp = 1, power = 1, range = 1, speed = 0, money_gen = 0,
                            position = Vec() })
 
   function ruleset.define:new_unit(specname, initial_position)
@@ -15,7 +15,7 @@ return function (ruleset)
       local spec = require('database.units.' .. specname)
       r:set(e, 'named', { name = spec.name })
       r:set(e, 'unit', { appearance = spec.appearance, max_hp = spec.max_hp, hp = spec.max_hp,
-                         power = spec.power or 1, range = spec.range or 1, speed = spec.speed or 0,
+                         power = spec.power or 1, range = spec.range or 1, speed = spec.speed or 0, money_gen = spec.money_gen,
                          position = initial_position})
       return e
     end
@@ -72,6 +72,15 @@ return function (ruleset)
     end
     function self.apply()
       return r:get(e, 'unit', 'position')
+    end
+  end
+
+  function ruleset.define:generate_money(e, money)
+    function self.when()
+      return r:is(e, 'unit') and r:get(e, 'unit', 'money_gen') ~= 0
+     end
+    function self.apply()
+      money:gain_money_amount(r:get(e, 'unit', 'money_gen'))
     end
   end
 

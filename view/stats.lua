@@ -1,8 +1,10 @@
 
 local Stats = require 'common.class' ()
 
-function Stats:_init(position)
+function Stats:_init(position, rules, money)
   self.time_left = 0
+  self.rules = rules
+  self.money = money
   self.position = position
   self.font = love.graphics.newFont('assets/fonts/VT323-Regular.ttf', 36)
   self.font:setFilter('nearest', 'nearest')
@@ -24,7 +26,7 @@ function Stats:draw()
   g.setFont(self.font)
   g.setColor(1, 1, 1)
   g.translate(self.position:get())
-  g.print(("Gild %d"):format(1000))
+  g.print(("Gild %d"):format(self.rules:get_money_amount(self.money)))
   if self.time_left > 0 then
     g.print(("\nNext wave starting in... %d"):format(self.time_left))
   end

@@ -13,7 +13,7 @@ package.path = "lib/?.lua;lib/?/init.lua;" .. package.path
 
 local RULE_MODULES = { 'rules' }
 
-local RULESETS = { 'unit' }
+local RULESETS = { 'unit', 'money'}
 
 local rules = require 'ur-proto' (RULE_MODULES, RULESETS)
 
@@ -52,7 +52,11 @@ function PlayStageState:_load_view()
   self.atlas = SpriteAtlas()
   self.cursor = Cursor(self.battlefield)
   local _, right, top, _ = self.battlefield.bounds:get()
-  self.stats = Stats(Vec(right + 16, top))
+  
+  self.money = rules:new_money()
+  rules:set_money_amount(self.money, self.stage.starting_money)
+  self.stats = Stats(Vec(right + 16, top), rules, self.money)
+
   self:view('bg'):add('battlefield', self.battlefield)
   self:view('fg'):add('atlas', self.atlas)
   self:view('bg'):add('cursor', self.cursor)
@@ -81,12 +85,15 @@ end
 
 function PlayStageState:on_mousepressed(_, _, button)
   if button == 1 then
-    local warrior = self:_create_unit_at('warrior', Vec(self.cursor:get_position()))
-    self.player_units[warrior] = true
+    if(rules:spend_money_amount(self.money, 10)) then
+      local farmer = self:_create_unit_at('farmer', Vec(self.cursor:get_position()))
+      self.player_units[farmer] = true
+    end
   end
 end
 
 function PlayStageState:update(dt)
+  --print("NEW LOOP")
   self.wave:update(dt)
   self.stats:update(dt)
   local pending = self.wave:poll()
@@ -136,6 +143,7 @@ function PlayStageState:update(dt)
     if unit:get_name() == "Capital" then
       has_capital = true
     end
+    unit:generate_money(self.money)
   end
   if not has_capital then
     self:pop()

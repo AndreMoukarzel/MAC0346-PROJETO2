@@ -6,6 +6,7 @@ return {
   blue = { .4, .4, 1 },
   white = { .7, .7, .9 },
   gray = { .3, .3, .3 },
-  yellow = {1, 1, 0}
+  yellow = {1, 1, 0},
+  brown = { 1, 1, .4}
 }
 
