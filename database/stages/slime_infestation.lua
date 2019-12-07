@@ -6,6 +6,9 @@ return {
     { {"green_slime", 20} },
     { {"blue_slime", 5}, {"green_slime", 30} },
   },
-  starting_money = 1500
+  starting_money = 30,
+  buyables = {
+	"warrior", "farmer"
+  }
 }
 

@@ -1,10 +1,10 @@
 
 local Wave = require 'model.wave'
-local Unit = require 'model.unit'
 local Vec = require 'common.vec'
 local Cursor = require 'view.cursor'
 local SpriteAtlas = require 'view.sprite_atlas'
 local BattleField = require 'view.battlefield'
+local UnitSelector = require 'view.unit_selector'
 local Stats = require 'view.stats'
 local State = require 'state'
 
@@ -32,6 +32,8 @@ function PlayStageState:_init(stack)
   self.n_monsters = nil
   self.wait_time = 0
   self.time_left = 0
+  self.buyables = nil
+  self.selected_unit = 0
 end
 
 function PlayStageState:enter(params)
@@ -45,26 +47,32 @@ function PlayStageState:leave()
   self:view('fg'):remove('atlas')
   self:view('bg'):remove('cursor')
   self:view('hud'):remove('stats')
+  self:view('us'):remove('unit_selector')
+  self:view('bg'):remove('buyables_cursor')
 end
 
 function PlayStageState:_load_view()
   self.battlefield = BattleField()
   self.atlas = SpriteAtlas()
-  self.cursor = Cursor(self.battlefield)
+  self.cursor = Cursor(self.battlefield, 'mouse')
   local _, right, top, _ = self.battlefield.bounds:get()
-
+  self.stats = Stats(Vec(right + 16, top))
   self.money = rules:new_money()
   rules:set_money_amount(self.money, self.stage.starting_money)
   self.stats = Stats(Vec(right + 16, top), rules, self.money)
-
   self.wait_time = 3
   self.time_left = self.wait_time
   self.stats:set_time(self.time_left)
-
+  self.unit_selector = UnitSelector(self.stage.buyables, Vec(600, 400), self.atlas)
+  self.buyables_cursor = Cursor(self.unit_selector, 'keyboard')
+  local pos = self.unit_selector:get_pos(1)
+  self.buyables_cursor:set_pos(pos)
   self:view('bg'):add('battlefield', self.battlefield)
   self:view('fg'):add('atlas', self.atlas)
   self:view('bg'):add('cursor', self.cursor)
   self:view('hud'):add('stats', self.stats)
+  self:view('us'):add('unit_selector', self.unit_selector)
+  self:view('bg'):add('buyables_cursor', self.buyables_cursor)
 end
 
 function PlayStageState:_load_units()
@@ -78,6 +86,9 @@ function PlayStageState:_load_units()
   self.wave:start()
   self.monsters = {}
   self.n_monsters = 0
+  self.selected_unit = 1
+  self.buyables = self.stage.buyables
+
 end
 
 function PlayStageState:_create_unit_at(specname, pos)
@@ -86,11 +97,22 @@ function PlayStageState:_create_unit_at(specname, pos)
   return unit
 end
 
+function PlayStageState:on_keypressed(key)
+  if key == 'down' or key == 's' then
+    self.selected_unit = self.selected_unit % #self.buyables + 1
+  elseif key == 'up' or key == 'w' then
+    self.selected_unit = (self.selected_unit - 2)  % #self.buyables + 1
+  end
+  local pos = self.unit_selector:get_pos(self.selected_unit)
+  self.buyables_cursor:set_pos(pos)
+end
+
 function PlayStageState:on_mousepressed(_, _, button)
   if button == 1 then
     if(rules:spend_money_amount(self.money, 10)) then
-      local farmer = self:_create_unit_at('farmer', Vec(self.cursor:get_position()))
-      self.player_units[farmer] = true
+      local selected_unit = self.buyables[self.selected_unit]
+      local new_unit = self:_create_unit_at(selected_unit, Vec(self.cursor:get_position()))
+      self.player_units[new_unit] = true
     end
   end
 end
@@ -166,4 +188,3 @@ function PlayStageState:resume(params)
 end
 
 return PlayStageState
-

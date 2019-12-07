@@ -9,7 +9,8 @@ function love.load()
   _game = {
     bg_view = View(),
     fg_view = View(),
-    hud_view = View()
+    hud_view = View(),
+    us_view = View()
   }
   _stack = Stack(_game)
   _stack:push('choose_stage')
@@ -26,6 +27,7 @@ function love.draw()
   _game.bg_view:draw()
   _game.fg_view:draw()
   _game.hud_view:draw()
+  _game.us_view:draw()
 end
 
 for eventname, _ in pairs(love.handlers) do

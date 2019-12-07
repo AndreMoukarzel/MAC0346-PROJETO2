@@ -22,7 +22,11 @@ E5
 
 V1
 V2
+V3
+V4
 
+U1:
+Atráves das teclas "w" ou "up" e "s" ou "down"
 U2
 U3
 U4

@@ -1,6 +1,6 @@
 
 return {
-  name = "Warrior Troop",
+  name = "Warrior Trop",
   max_hp = 10,
   appearance = 'knight',
 
@@ -8,4 +8,3 @@ return {
   power = 5,
   range = 2
 }
-
