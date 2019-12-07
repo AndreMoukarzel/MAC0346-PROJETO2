@@ -15,8 +15,8 @@ return function (ruleset)
       local spec = require('database.units.' .. specname)
       r:set(e, 'named', { name = spec.name })
       r:set(e, 'unit', { appearance = spec.appearance, max_hp = spec.max_hp, hp = spec.max_hp,
-                         power = spec.power or 1, range = spec.range or 1, speed = spec.speed or 0, money_gen = spec.money_gen,
-                         position = initial_position})
+                         power = spec.power or 1, range = spec.range or 1, speed = spec.speed or 0,
+                         money_gen = spec.money_gen, position = initial_position})
       return e
     end
   end
@@ -100,7 +100,7 @@ return function (ruleset)
     function self.apply()
       local delta = other:get_position() - e:get_position()
       if delta:length() < 32 then
-        r:set(e, 'unit', { position = r:get(e, 'unit', 'position'):add(-delta:normalized() * 
+        r:set(e, 'unit', { position = r:get(e, 'unit', 'position'):add(-delta:normalized() *
                                                                        delta:length()) })
       end
     end
@@ -135,7 +135,7 @@ return function (ruleset)
       return r:is(e, 'unit')
     end
     function self.apply()
-      current_hp = r:get(e, 'unit', 'hp')
+      local current_hp = r:get(e, 'unit', 'hp')
       r:set(e, 'unit', { hp = math.max(0, current_hp - damage) })
     end
   end

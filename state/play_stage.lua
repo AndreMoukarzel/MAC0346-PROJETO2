@@ -121,7 +121,7 @@ function PlayStageState:update(dt)
   if self.time_left <= 0 then
     if self.n_monsters == 0 and self.wave:is_finish() then
       if self.next_wave > self.max_wave then
-        self:push("win", {self.battlefield, self.atlas})
+        self:push("end", {b = self.battlefield, atlas = self.atlas, visual = 'trophy'})
       else
         self.wave = Wave(self.stage.waves[self.next_wave])
         self.next_wave = self.next_wave + 1
@@ -173,7 +173,7 @@ function PlayStageState:update(dt)
       unit:generate_money(self.money)
     end
     if not has_capital then
-      self:pop()
+      self:push("end", {b = self.battlefield, atlas = self.atlas, visual = 'skull'})
     end
   else
     self.time_left = self.time_left - dt
@@ -181,10 +181,8 @@ function PlayStageState:update(dt)
   end
 end
 
-function PlayStageState:resume(params)
-  if params == 'win' then
-    self:pop()
-  end
+function PlayStageState:resume()
+  self:pop()
 end
 
 return PlayStageState

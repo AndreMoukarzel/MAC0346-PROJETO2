@@ -2,14 +2,14 @@ André Ferrari Moukarzel, NUSP 9298166
 Pedro Paulo de Queiroz Bambace, NUSP 10297668
 Affonso Gino Amendola Neto, NUSP 9301753
 
-Tarefas completas
+As tarefas abaixo foram completadas
 
 A1
 A2
 A3
 A4
 
-Q1
+Q1: Exceção de end.lua, porque não é usado self, mas se não passemos como argumento quebraria a implementação da stack
 Q2
 Q3
 Q5
@@ -18,15 +18,14 @@ E1
 E2
 E3
 E4
-E5
+E5: a derrota é representada por uma caveira e qualquer tecla pressionada volta ao menu
 
 V1
 V2
 V3
-V4
+V4: a derrota é representada por um troféu e qualquer tecla pressionada volta ao menu
 
-U1:
-Atráves das teclas "w" ou "up" e "s" ou "down"
+U1: Atráves das teclas "w" ou "up" e "s" ou "down"
 U2
 U3
 U4

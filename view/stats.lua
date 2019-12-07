@@ -24,9 +24,6 @@ function Stats:draw()
   if self.time_left > 0 then
     g.print(("\nNext wave starting in... %d"):format(self.time_left))
   end
-  if global_selected then
-    g.print(("\n\n%s"):format(global_selected))
-  end
   g.translate(0, self.font:getHeight())
   g.pop()
 end

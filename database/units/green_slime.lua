@@ -5,7 +5,7 @@ return {
   appearance = 'slime',
 
   power = 2,
-  range = 1,
+  range = 2,
   speed = 20
 }
 

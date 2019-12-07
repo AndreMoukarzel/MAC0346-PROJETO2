@@ -41,11 +41,15 @@ return {
     farmer = {
       frame = { 31, 2 },
       color = 'brown'
-    }, 
+    },
     trophy = {
       frame = {24, 28},
       color = 'yellow'
-  }
+    },
+    skull = {
+      frame = {22, 23},
+      color = 'white'
+    }
   }
 }
 
